@@ -332,4 +332,59 @@ describe('groupList', function () {
     assert.calledWith($window.open, 'https://test.hypothes.is/groups/new',
       '_blank');
   });
+  describe('#showGroupMenu', () => {
+    it('should set showGroupMenu=false if third party service and only one group', function () {
+      // Configure third party service.
+      fakeSettings.authDomain = 'example.com';
+      fakeSettings.services = [{
+        authority: 'publisher.org',
+      }];
+      
+      // Configure only one group.
+      const group = [{
+        id: 'h-devs',
+        links: {
+          html: PRIVATE_GROUP_LINK,
+        },
+        name: 'Hypothesis Developers',
+        organization: groupFixtures.defaultOrganization(),
+        type: 'private',
+      }];
+      fakeGroups.all = () => { return group; };
+  
+      const element = createGroupList();
+  
+      assert.isFalse(element.ctrl.showGroupsMenu());
+    });
+  
+    it('should set showGroupMenu=true if there is more than one group', function () {
+      // Configure third party service.
+      fakeSettings.authDomain = 'example.com';
+      fakeSettings.services = [{
+        authority: 'publisher.org',
+      }];
+  
+      const element = createGroupList();
+  
+      assert.isTrue(element.ctrl.showGroupsMenu());
+    });
+  
+    it('should set showGroupMenu=true if it is not a thirdparty service', function () {
+      // Configure only one group.
+      const group = [{
+        id: 'h-devs',
+        links: {
+          html: PRIVATE_GROUP_LINK,
+        },
+        name: 'Hypothesis Developers',
+        organization: groupFixtures.defaultOrganization(),
+        type: 'private',
+      }];
+      fakeGroups.all = () => { return group; };
+  
+      const element = createGroupList();
+  
+      assert.isTrue(element.ctrl.showGroupsMenu());
+    });
+  });
 });
